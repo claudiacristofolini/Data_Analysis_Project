@@ -408,17 +408,8 @@ ggplot(data, aes(x = total_price, y = reward_points)) + geom_point(alpha = 0.6) 
   labs(title = "Linear Regression: Reward Points vs Total Price", x = "Total Price", y = "Reward Points") +theme_minimal()
 
 # Model 2
-ggplot(data, aes(x = total_price, y = reward_points, color = customer_type)) +
-  geom_point(alpha = 0.6) +
-  geom_smooth(method = "lm", se = FALSE) +
-  labs(
-    title = "Linear Regression by Customer Type",
-    x = "Total Price",
-    y = "Reward Points",
-    color = "Customer Type"
-  ) +
-  theme_minimal()
-
+ggplot(data, aes(x = total_price, y = reward_points, color = customer_type)) +geom_point(alpha = 0.6) + geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Linear Regression by Customer Type",x = "Total Price",y = "Reward Points",color = "Customer Type") + theme_minimal()
 
 # Model 3
 ggplot(data, aes(x = total_price, y = reward_points, color = customer_type)) + geom_point(alpha = 0.6) +
