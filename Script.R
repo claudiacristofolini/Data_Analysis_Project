@@ -24,7 +24,7 @@ View(data)
 # STATISTICAL SUMMARY  (KPIs)
 # We display the summary of data 
 summary(data)
-# We calculate the main metrics to establish a baseline for our analysis
+# We display the main metrics to establish a baseline for our analysis into KPI for better visualization
 kpi_summary <- data %>%
   summarise(
     Total_Revenue = sum(total_price),
