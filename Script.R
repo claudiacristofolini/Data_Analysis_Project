@@ -258,3 +258,51 @@ conf.matrix
 accuracy=sum(diag(conf.matrix)) /sum(conf.matrix)
 accuracy
 
+# =================================================================
+# LINEAR REGRESSION
+# =================================================================
+
+# 1. INSTALL AND LOAD THE NECFESSARY VISUALIZATION PACKAGE
+install.packages("ggplot2")
+library(ggplot2)
+
+# 2. MODEL CONSTRUCTION
+# Model 1: simple linear regression using total_price as the only predictor
+model1=lm(reward_points ~ total_price, data = data)
+
+# Model 2: Multiple linear regression adding customer_type 
+model2=lm(reward_points ~ total_price + customer_type, data = data)
+
+# Model 3: Full model including product_category
+model3=lm(reward_points ~ total_price + customer_type + product_category, data = data)
+
+# 3.MODEL EVALUATION AND COMPARATIVE ANALYSIS
+summary(model1)
+summary(model2)
+summary(model3)
+
+# Perform an Analysis of Variance (ANOVA) to compare the nested models and determine if the increased complexity is statistically justified
+anova(model1,model2,model3)
+
+# 4. GRAPHS OF LINEAR REGRESSION MODELS
+# Model 1
+ggplot(data, aes(x = total_price, y = reward_points)) + geom_point(alpha = 0.6) + geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Linear Regression: Reward Points vs Total Price", x = "Total Price", y = "Reward Points") +theme_minimal()
+
+# Model 2
+ggplot(data, aes(x = total_price, y = reward_points, color = customer_type)) + geom_point(alpha = 0.6) 
+  +     geom_smooth(method = "lm", se = FALSE) 
+  +     labs(title = "Linear Regression by Customer Type", x = "Total Price",y = "Reward Points", color = "Customer Type") 
+  +     theme_minimal()
+
+# Model 3
+ggplot(data, aes(x = total_price, y = reward_points, color = customer_type)) + geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~ product_category) +
+  labs(title = "Linear Regression by Product Category and Customer Type",x = "Total Price",y = "Reward Points",color = "Customer Type") +theme_minimal()
+
+
+# 5. NORMAL Q-Q PLOT
+par(mfrow = c(1,1))
+qqnorm(resid(model3))
+qqline(resid(model3))
