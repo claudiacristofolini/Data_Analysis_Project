@@ -184,7 +184,30 @@ corrplot(cor_matrix, method = "color", type = "upper", order = "original",
          title = "Pearson Correlation Matrix of Quantitative Sales Variables", 
          mar = c(0,0,2,0))
 
+# To deep dive into the correlation between Price and Quantity, we perform
+# a PRICE SENSITIVITY ANALYSIS using a Scatter plot to see if the variables
+# change respecting to Branches or Cities
 
+plot_price_qty <- data %>%
+  ggplot(aes(x = unit_price, y = quantity)) +
+  # We map 'branch' to color and 'city' to shape to distinguish NY from Chicago 
+  # within Branch A
+  geom_jitter(aes(color = branch, shape = city), alpha = 0.7, size = 2.5) + 
+  # We keep the regression lines focused on the Branch level for clarity
+  geom_smooth(aes(color = branch), method = "lm", se = FALSE, size = 1) +
+  # Colors: Blue for A, Red for B as used at the beginning
+  scale_color_manual(values = c("A" = "royalblue3", "B" = "red3")) +
+  # Shapes: Circle (19), Triangle (17), Square (15) for maximum distinction
+  scale_shape_manual(values = c("Chicago" = 19, "New York" = 17, 
+                                "Los Angeles" = 15)) +
+  theme_minimal() +
+  labs(title = "Price Sensitivity Analysis: Unit Price vs. Quantity",
+       x = "Unit Price (€)",
+       y = "Quantity Purchased",
+       color = "Branch",
+       shape = "City")
+
+plot_price_qty
 
 
 # =================================================================
