@@ -25,8 +25,11 @@ View(data)
 
 # STATISTICAL SUMMARY  (KPIs)
 # We display the summary of data 
+
 summary(data)
-# We display the main metrics to establish a baseline for our analysis into KPI for better visualization
+# We display the main metrics to establish a baseline for our analysis into KPI 
+# for better visualization
+
 kpi_summary <- data %>%
   summarise(
     Total_Revenue = sum(total_price),
@@ -55,7 +58,9 @@ plot_branch <- data %>%
   scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
   scale_fill_manual(values = c("A" = "royalblue3", "B" = "red3")) +
   theme_minimal() +
-  labs(title = "Total Revenues by City and Branch", x = "City", y = "Total Revenue (€)",fill = "Branch")
+  labs(title = "Total Revenues by City and Branch", x = "City", 
+  y = "Total Revenue (€)",fill = "Branch")
+
 plot_branch
 
 
@@ -76,7 +81,9 @@ plot_gender <- data %>%
   labs(title = "Gender-based Quantity Analysis", x = "Gender", y = "Total Quantity")
 plot_gender
 
-# We evaluate the ratio of Members vs. Normal customers to see the loyalty program penetration 
+# We evaluate the ratio of Members vs. Normal customers to see the loyalty
+# program penetration 
+
 # Pie chart: Distribution of Sales by Customer Type (Members or not)
 plot_cust <- data %>%
   count(customer_type) %>%
@@ -85,10 +92,12 @@ plot_cust <- data %>%
   geom_bar(stat = "identity", width = 1, color = "white", linewidth = 1) +
   coord_polar("y", start = 0) +
   geom_text(aes(label = percent(perc, accuracy = 0.1)), 
-            position = position_stack(vjust = 0.5), color = "white", fontface = "bold", size= 5) +
+            position = position_stack(vjust = 0.5), color = "white", 
+            fontface = "bold", size= 5) +
   scale_fill_manual(values = c("Member" = "orange", "Normal" = "sienna4")) +
   theme_void() +
   labs(title = "Sales Distribution by Customer Type", fill = "Type")
+
 plot_cust
 
 
@@ -102,14 +111,17 @@ plot_prod <- data %>%
   ggplot(aes(x = reorder(product_name, Total_Qty), y = Total_Qty)) +
   geom_bar(stat = "identity", fill = "forestgreen") +
   # Internal white labels for horizontal bar charts
-  geom_text(aes(label = round(Total_Qty)), hjust = 1.1, color = "white", fontface = "bold") +
+  geom_text(aes(label = round(Total_Qty)), hjust = 1.1, color = "white", 
+  fontface = "bold") +
   coord_flip() +  # swapping coordinates x, y for cleaner labeling
   theme_minimal() +
   labs(title = "Top-selling Products by Quantity", x = "Product", y = "Quantity")
+
 plot_prod
 
 # Analysis of Sales Volume  to identify which categories have the highest inventory turnover.
 # (the most frequently purchased, that usually are "essential" or "high-frequency product" 
+
 # Bar plot: Top-selling Categories by Quantity
 plot_cat <- data %>%
   group_by(product_category) %>%
@@ -117,10 +129,12 @@ plot_cat <- data %>%
   ggplot(aes(x = reorder(product_category, Total_Qty), y = Total_Qty)) +
   geom_bar(stat = "identity", fill = "steelblue") +
   # white labels for horizontal bar charts
-  geom_text(aes(label = round(Total_Qty)), hjust = 1.1, color = "white", fontface = "bold") +
+  geom_text(aes(label = round(Total_Qty)), hjust = 1.1, color = "white",
+  fontface = "bold") +
   coord_flip() +
   theme_minimal() +
   labs(title = "Top-selling Categories by Quantity", x = "Product Category", y = "Quantity")
+
 plot_cat
 
 
@@ -152,18 +166,23 @@ library(corrplot)
 # and remove qualitative columns and 'sale_id' (which is just an index).
 numeric_data <- data %>%
   select(unit_price, quantity, tax, total_price, reward_points)
+
 # We compute the Pearson correlation coefficient for each pair of variables.
 cor_matrix <- cor(numeric_data)
+
 # Rename labels
 colnames(cor_matrix) <- c("Unit Price","Quantity", "Tax","Total Price", "Reward Points")
 rownames(cor_matrix) <- colnames(cor_matrix)
+
 # We generate the heatmap using a color palette (Red-White-Blue).
 # This visualization helps identify strong positive (Blue) or negative (Red) relationships.
+
 corrplot(cor_matrix, method = "color", type = "upper", order = "original",      
          addCoef.col = "black", number.cex = 0.8,  # fonts for coefficients
          tl.col = "black", tl.srt = 45,    # text labels
          col = COL2('RdBu', 10),  # Red-Blu palette
-         title = "Pearson Correlation Matrix of Quantitative Sales Variables", mar = c(0,0,2,0))
+         title = "Pearson Correlation Matrix of Quantitative Sales Variables", 
+         mar = c(0,0,2,0))
 
 
 
@@ -220,7 +239,8 @@ clusters_avg <- cutree(hc_average, k = 3)
 clusters_avg
 
 # Visualize clusters on the Dendrogram
-plot(hc_average, main = "Dendrogram - Average Linkage (k=3)", labels = FALSE, xlab = "", sub = "")
+plot(hc_average, main = "Dendrogram - Average Linkage (k=3)", 
+labels = FALSE, xlab = "", sub = "")
 rect.hclust(hc_average, k = 3, border = "red")
 
 
@@ -238,10 +258,12 @@ as.integer(data$cluster)
 point=c(3,4,5)
 as.integer(data$city)
 
-plot(data$quantity,data$total_price,col=colors[as.integer(data$cluster)],pch=point[as.integer(data$city)])
+plot(data$quantity,data$total_price,col=colors[as.integer(data$cluster)],
+pch=point[as.integer(data$city)])
 
 as.integer(data$gender)
-plot(data$quantity,data$total_price,col=colors[as.integer(data$cluster)],pch=point[as.integer(data$gender)])
+plot(data$quantity,data$total_price,col=colors[as.integer(data$cluster)],
+pch=point[as.integer(data$gender)])
 
 
 
@@ -260,13 +282,19 @@ data_km$ifault
 
 View(data_scaled)
 
-plot(data_scaled[, 2], data_scaled[, 4], col = data_km$cluster, pch = 19,xlab = colnames(data_scaled)[2],  ylab = colnames(data_scaled)[4], main = "K-means clustering (k = 3)")
+plot(data_scaled[, 2], data_scaled[, 4], col = data_km$cluster, 
+pch = 19,xlab = colnames(data_scaled)[2],  ylab = colnames(data_scaled)[4], 
+     main = "K-means clustering (k = 3)")
 points(centroids[, 2], centroids[, 4],pch = 1,    cex = 1.5,  col = "black")
-text(centroids[, 2], centroids[, 4], labels = paste("C", 1:nrow(centroids)),pos = 3, cex = 0.8)
+text(centroids[, 2], centroids[, 4], labels = paste("C", 1:nrow(centroids)),
+pos = 3, cex = 0.8)
 
-plot(data_scaled[, 1], data_scaled[, 2], col = data_km$cluster, pch = 19,xlab = colnames(data_scaled)[1],  ylab = colnames(data_scaled)[2], main = "K-means clustering (k = 3)")
+plot(data_scaled[, 1], data_scaled[, 2], col = data_km$cluster, 
+pch = 19,xlab = colnames(data_scaled)[1],  ylab = colnames(data_scaled)[2], 
+     main = "K-means clustering (k = 3)")
 points(centroids[, 1], centroids[, 2],pch = 1,    cex = 1.5,  col = "black")
-text(centroids[, 1], centroids[, 2], labels = paste("C", 1:nrow(centroids)),pos = 3, cex = 0.8)
+text(centroids[, 1], centroids[, 2], labels = paste("C", 1:nrow(centroids)),
+pos = 3, cex = 0.8)
 
 hullplot(data_scaled[, c(2, 4)], data_km$cluster,main = "K-means clustering")
 points(centroids[, 2], centroids[,4],pch = 1,cex = 1.5,col = "black")
@@ -335,7 +363,9 @@ table(data$gender,data$pca.3)
 library(FactoMineR)
 
 data.pc=PCA(data[,c(8:12)],graph=FALSE)
-fviz_pca_var(data.pc, col.var = "contrib",gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),repel = TRUE,ggtheme = theme_minimal()) 
+fviz_pca_var(data.pc, col.var = "contrib",
+gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+repel = TRUE,ggtheme = theme_minimal()) 
 summary(data.pc)
 
 # Extract variable information from PCA: contributions of variables to the first five PCs
@@ -399,23 +429,43 @@ summary(model1)
 summary(model2)
 summary(model3)
 
-# Perform an Analysis of Variance (ANOVA) to compare the nested models and determine if the increased complexity is statistically justified
+# Perform an Analysis of Variance (ANOVA) to compare the nested models and 
+# determine if the increased complexity is statistically justified
 anova(model1,model2,model3)
 
 # 4. GRAPHS OF LINEAR REGRESSION MODELS
 # Model 1
-ggplot(data, aes(x = total_price, y = reward_points)) + geom_point(alpha = 0.6) + geom_smooth(method = "lm", se = FALSE) +
-  labs(title = "Linear Regression: Reward Points vs Total Price", x = "Total Price", y = "Reward Points") +theme_minimal()
+ggplot(data, aes(x = total_price, y = reward_points)) + 
+geom_point(alpha = 0.6) + 
+geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Linear Regression: Reward Points vs Total Price", 
+  x = "Total Price", 
+  y = "Reward Points") +
+  theme_minimal()
 
 # Model 2
-ggplot(data, aes(x = total_price, y = reward_points, color = customer_type)) +geom_point(alpha = 0.6) + geom_smooth(method = "lm", se = FALSE) +
-  labs(title = "Linear Regression by Customer Type",x = "Total Price",y = "Reward Points",color = "Customer Type") + theme_minimal()
+ggplot(data, aes(x = total_price, y = reward_points, color = customer_type)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(
+    title = "Linear Regression by Customer Type",
+    x = "Total Price",
+    y = "Reward Points",
+    color = "Customer Type"
+  ) +
+  theme_minimal()
+
 
 # Model 3
-ggplot(data, aes(x = total_price, y = reward_points, color = customer_type)) + geom_point(alpha = 0.6) +
+ggplot(data, aes(x = total_price, y = reward_points, color = customer_type)) + 
+geom_point(alpha = 0.6) +
   geom_smooth(method = "lm", se = FALSE) +
   facet_wrap(~ product_category) +
-  labs(title = "Linear Regression by Product Category and Customer Type",x = "Total Price",y = "Reward Points",color = "Customer Type") +theme_minimal()
+  labs(title = "Linear Regression by Product Category and Customer Type",
+  x = "Total Price",
+  y = "Reward Points",
+  color = "Customer Type") +
+  theme_minimal()
 
 
 # 5. NORMAL Q-Q PLOT
