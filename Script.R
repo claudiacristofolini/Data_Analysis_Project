@@ -286,12 +286,23 @@ as.integer(data$cluster)
 point=c(3,4,5)
 as.integer(data$city)
 
-plot(data$quantity,data$total_price,col=colors[as.integer(data$cluster)],
-pch=point[as.integer(data$city)])
+
+plot(data$quantity, data$total_price, col = colors[data$cluster],
+  pch = point[data$city], xlab = "Quantity", ylab = "Total price",
+  main = "Quantity vs Total Price")
+legend("top",  legend = unique(data_km$cluster), col = colors,
+  pch = 16, title = "Cluster", cex = 0.8)
+legend(  "topleft", legend = levels(data$city), pch = point,
+  title = "City", cex = 0.8)
 
 as.integer(data$gender)
 plot(data$quantity,data$total_price,col=colors[as.integer(data$cluster)],
-pch=point[as.integer(data$gender)])
+pch=point[as.integer(data$gender)], xlab = "Quantity", ylab = "Total price",
+  main = "Quantity vs Total Price")
+legend("top", legend = unique(data_km$cluster), col = colors,
+  pch = 16, title = "Cluster", cex = 0.8)
+legend(  "topleft", legend = levels(data$gender), pch = point,
+  title = "City", cex = 0.8)
 
 
 
