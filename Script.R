@@ -5,6 +5,12 @@
 # =================================================================
 
 # 1. SET UP
+install.packages("tidyverse")
+install.packages("scales")
+install.packages("corrplot")
+install.packages("cluster")
+install.packages("dbscan")
+
 library(tidyverse)
 library(scales)
 
@@ -145,8 +151,6 @@ plot_cat_rev
 
 # CORRELATION ANALYSIS 
 
-# Library installation (run only once if not installed)
-# install.packages("corrplot")
 library(corrplot)
 
 # For correlation analysis we use only numeric variables
@@ -165,5 +169,95 @@ corrplot(cor_matrix, method = "color", type = "upper", order = "original",
          tl.col = "black", tl.srt = 45,    # text labels
          col = COL2('RdBu', 10),  # Red-Blu palette
          title = "Pearson Correlation Matrix of Quantitative Sales Variables", mar = c(0,0,2,0))
+
+
+# =================================================================
+# R SCRIPT: CLUSTERING ANALYSIS
+# =================================================================
+
+library(cluster)
+library(dbscan)
+
+# 1. Setup and Data Loading
+data<-read.csv("sales.csv", stringsAsFactors = TRUE)
+View(data)
+any(is.na(data))
+data$customer_type <- as.factor(data$customer_type)
+data$product_category <- as.factor(data$product_category)
+data$gender <- as.factor(data$gender)
+data$city <- as.factor(data$city)
+data$branch <- as.factor(data$branch)
+data$product_name <- as.factor(data$product_name)
+
+
+# 2. Preparation
+numeric_cols <- data[, c("unit_price", "quantity", "tax", "total_price", "reward_points")]
+data_scaled <- scale(numeric_cols)
+dist_matrix <- dist(data_scaled, method = "euclidean")
+
+
+# 3. Hierarchical Clustering
+
+#       A) Models
+# -- Single Linkage --
+hc_single <- hclust(dist_matrix, method = "single")
+plot(hc_single, main = "Dendrogram - Single Linkage", xlab = "", sub = "", labels = FALSE)
+# -- Complete Linkage --
+hc_complete <- hclust(dist_matrix, method = "complete")
+plot(hc_complete, main = "Dendrogram - Complete Linkage", xlab = "", sub = "", labels = FALSE)
+# -- Average Linkage --
+hc_average <- hclust(dist_matrix, method = "average")
+plot(hc_average, main = "Dendrogram - Average Linkage", xlab = "", sub = "", labels = FALSE)
+# -- Ward's Method --
+hc_ward <- hclust(dist_matrix, method = "ward.D2")
+plot(hc_ward, main = "Dendrogram - Ward's Method", xlab = "", sub = "", labels = FALSE)
+
+#       B) Cut Tree and Dendrogram (focus on Average Linkage)
+# Cut the Average Linkage tree into 3 clusters
+clusters_avg <- cutree(hc_average, k = 3)
+clusters_avg
+# Visualize clusters on the Dendrogram
+plot(hc_average, main = "Dendrogram - Average Linkage (k=3)", labels = FALSE, xlab = "", sub = "")
+rect.hclust(hc_average, k = 3, border = "red")
+
+#       C) Cluster Visualization
+data$cluster=clusters_avg
+View(data)
+table(data[,c(3,13)])
+table(data[,c(5,13)])
+colors=c("red","blue","green")
+as.integer(data$cluster)
+point=c(3,4,5)
+as.integer(data$city)
+plot(data$quantity,data$total_price,col=colors[as.integer(data$cluster)],pch=point[as.integer(data$city)])
+as.integer(data$gender)
+plot(data$quantity,data$total_price,col=colors[as.integer(data$cluster)],pch=point[as.integer(data$gender)])
+
+
+# 4. K-means Clustering
+data_km= kmeans(data_scaled, 3, nstart = 50)
+data_km
+data_km$cluster
+centroids=data_km$centers
+centroids
+data_km$iter
+data_km$ifault
+View(data_scaled)
+
+plot(data_scaled[, 2], data_scaled[, 4], col = data_km$cluster, pch = 19,xlab = colnames(data_scaled)[2],  ylab = colnames(data_scaled)[4], main = "K-means clustering (k = 3)")
+points(centroids[, 2], centroids[, 4],pch = 1,    cex = 1.5,  col = "black")
+text(centroids[, 2], centroids[, 4], labels = paste("C", 1:nrow(centroids)),pos = 3, cex = 0.8)
+
+plot(data_scaled[, 1], data_scaled[, 2], col = data_km$cluster, pch = 19,xlab = colnames(data_scaled)[1],  ylab = colnames(data_scaled)[2], main = "K-means clustering (k = 3)")
+points(centroids[, 1], centroids[, 2],pch = 1,    cex = 1.5,  col = "black")
+text(centroids[, 1], centroids[, 2], labels = paste("C", 1:nrow(centroids)),pos = 3, cex = 0.8)
+
+hullplot(data_scaled[, c(2, 4)], data_km$cluster,main = "K-means clustering")
+points(centroids[, 2], centroids[,4],pch = 1,cex = 1.5,col = "black")
+text(centroids[, 2], centroids[, 4],labels = paste("C", 1:nrow(centroids)),pos = 3,cex = 0.8)
+
+hullplot(data_scaled[, c(1, 2)], data_km$cluster,main = "K-means clustering")
+points(centroids[, 1], centroids[, 2],pch = 1,cex = 1.5,col = "black")
+text(centroids[, 1], centroids[, 2],labels = paste("C", 1:nrow(centroids)),pos = 3,cex = 0.8)
 
 
