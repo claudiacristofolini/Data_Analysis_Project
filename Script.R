@@ -1,30 +1,23 @@
-# ====================================================================
+# ==============================================================================
 # PROJECT: ANALYSIS OF SALES DATASET
-# AUTHORS: Benedetta Di Palma, Claudia Cristofolini, Vittoria Calonghi
+# AUTHORS: Calonghi Vittoria, Cristofolini Claudia, Di Palma Benedetta Di Palma
 # DATE: January 2026
-# =====================================================================
+# ==============================================================================
 
 # 1. SET UP
 install.packages("tidyverse")
-install.packages("scales")
 install.packages("corrplot")
 install.packages("cluster")
 install.packages("dbscan")
-install.packages("ggplot2")
 install.packages("rpart")
 install.packages("rpart.plot")
-
-library(tidyverse)
-library(scales)
+install.packages("factoextra")
+install.packages("FactoMineR")
 
 
 # 2. DATA LOADING & PRE-PROCESSING
-# We use raw url from our repository on GitHub to avoid acquisition errors
-raw_url <- "https://raw.githubusercontent.com/Vittoria-C/Data_Analysis_Project/refs/heads/main/sales.csv"
-
-# We convert nominal strings to factors to ensure correct domain definition
-# and enables frequency-based analysis during the EDA phase.
-data <- read.csv(raw_url, stringsAsFactors = TRUE)
+library(tidyverse)
+library(scales)
 
 View(data)
 
@@ -291,6 +284,8 @@ text(centroids[, 1], centroids[, 2],labels = paste("C", 1:nrow(centroids)),pos =
 
 # 1. DATA PREPARATION FOR PCA
 # Selecting only numeric columns for PCA
+library(factoextra)
+
 numeric_cols <- data[, c("unit_price", "quantity", "tax", "total_price", "reward_points")] 
 
 #Scaling the data (normalization)
@@ -319,8 +314,12 @@ data.pca.3=data.pca$x[,c(1,2,3)]
 data.pca.3
 
 # Assign clusters based on hierarchical clustering (3 groups)
+dist_pca=dist(data.pca.3, method = "euclidean")
+data.pca.3.hc=hclust(dist_pca)
+
 data$pca.3=cutree(data.pca.3.hc,3) #add cluster membership to each observation (1–3)
 data$pca.3
+
 View(data)
 
 # Summarize numeric and categorical variables for each cluster
@@ -333,7 +332,6 @@ table(data$city,data$pca.3)
 table(data$gender,data$pca.3)
 
 # 5. ADVANCED PCA USING FactoMineR for a more detailed analysis after prcomp
-install.packages("FactoMineR")
 library(FactoMineR)
 
 data.pc=PCA(data[,c(8:12)],graph=FALSE)
@@ -410,10 +408,17 @@ ggplot(data, aes(x = total_price, y = reward_points)) + geom_point(alpha = 0.6) 
   labs(title = "Linear Regression: Reward Points vs Total Price", x = "Total Price", y = "Reward Points") +theme_minimal()
 
 # Model 2
-ggplot(data, aes(x = total_price, y = reward_points, color = customer_type)) + geom_point(alpha = 0.6) 
-  +     geom_smooth(method = "lm", se = FALSE) 
-  +     labs(title = "Linear Regression by Customer Type", x = "Total Price",y = "Reward Points", color = "Customer Type") 
-  +     theme_minimal()
+ggplot(data, aes(x = total_price, y = reward_points, color = customer_type)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(
+    title = "Linear Regression by Customer Type",
+    x = "Total Price",
+    y = "Reward Points",
+    color = "Customer Type"
+  ) +
+  theme_minimal()
+
 
 # Model 3
 ggplot(data, aes(x = total_price, y = reward_points, color = customer_type)) + geom_point(alpha = 0.6) +
