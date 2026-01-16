@@ -167,3 +167,94 @@ corrplot(cor_matrix, method = "color", type = "upper", order = "original",
          title = "Pearson Correlation Matrix of Quantitative Sales Variables", mar = c(0,0,2,0))
 
 
+# =================================================================
+# PRINCIPAL COMPONENT ANALYSIS AND DECISION TREE MODELLING
+# =================================================================
+
+# 1. DATA PREPARATION FOR PCA
+# Selecting only numeric columns for PCA
+numeric_cols <- data[, c("unit_price", "quantity", "tax", "total_price", "reward_points")] 
+
+#Scaling the data (normalization)
+data_scaled <- scale(numeric_cols)
+
+# 2. IMPLEMENTATION OF PCA
+data.pca=prcomp(data_scaled)
+
+#View PCA results (standard deviations, rotations/loadings)
+data.pca
+
+# 3. ANALYZING VARIANCE EXPLAINED
+# Extract eigenvalues and explained variance from the PCA results
+eig.values=get_eigenvalue(data.pca)
+eig.values
+
+# Scree plot shows the variance explained by each principal component.
+fviz_eig(data.pca, addlabels = TRUE, ylim = c(0, 100))
+
+
+# 4. PCA PROJECTION AND CLUSTER ANALYSIS
+data.pca$x
+
+# Select the first three principal components because they explain approximately 98% of the total variance
+data.pca.3=data.pca$x[,c(1,2,3)] 
+data.pca.3
+
+# Assign clusters based on hierarchical clustering (3 groups)
+data$pca.3=cutree(data.pca.3.hc,3) #add cluster membership to each observation (1–3)
+data$pca.3
+View(data)
+
+# Summarize numeric and categorical variables for each cluster
+summary(data[data$pca.3 == 1, ])
+summary(data[data$pca.3 == 2, ])
+summary(data[data$pca.3 == 3, ])
+
+# Explore cluster distribution by categorical and numeric variables
+table(data$city,data$pca.3)
+table(data$gender,data$pca.3)
+
+# 5. ADVANCED PCA USING FactoMineR for a more detailed analysis after prcomp
+install.packages("FactoMineR")
+library(FactoMineR)
+
+data.pc=PCA(data[,c(8:12)],graph=FALSE)
+fviz_pca_var(data.pc, col.var = "contrib",gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),repel = TRUE,ggtheme = theme_minimal()) 
+summary(data.pc)
+
+# Extract variable information from PCA: contributions of variables to the first five PCs
+var=get_pca_var(data.pc)
+var
+var$contrib
+round((var$contrib[,1:5]/100),3)
+
+
+# 6. DECISION TREE CLASSIFICATION
+# Install and load required packages
+install.packages("rpart")
+library(rpart)
+install.packages("rpart.plot")
+library(rpart.plot)
+
+# Split dataset into training (13%) and test set
+length(data)
+nrow(data)
+set.seed(2025)
+data.idx=sample(1000,1000*.13)
+data.train=data[data.idx,]
+data.test=data[-data.idx,]
+
+# Build a decision tree to classify data based on selected features
+data.dc=rpart(city~.,data=data.train)
+data.dc
+rpart.plot(data.dc)
+
+# Predict city for test set and valuate results with confusion matrix
+data.dc.pred=predict(data.dc,data.test,type='class')
+conf.matrix=table(data.test$city,data.dc.pred)
+conf.matrix
+   
+# Compute overall accuracy
+accuracy=sum(diag(conf.matrix)) /sum(conf.matrix)
+accuracy
+
