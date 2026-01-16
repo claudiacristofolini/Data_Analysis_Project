@@ -22,6 +22,8 @@ View(data)
 # 3. EXPLORATORY DATA ANALYSIS (EDA)
 
 # STATISTICAL SUMMARY  (KPIs)
+# We display the summary of data 
+summary(data)
 # We calculate the main metrics to establish a baseline for our analysis
 kpi_summary <- data %>%
   summarise(
