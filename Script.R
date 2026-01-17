@@ -502,5 +502,5 @@ geom_point(alpha = 0.6) +
 
 # 5. NORMAL Q-Q PLOT
 par(mfrow = c(1,1))
-qqnorm(resid(model3))
-qqline(resid(model3))
+qqnorm(resid(model2))
+qqline(resid(model2))
