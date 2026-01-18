@@ -1,8 +1,8 @@
-# ==============================================================================
+# ====================================================================
 # PROJECT: ANALYSIS OF SALES DATASET
-# AUTHORS: Calonghi Vittoria, Cristofolini Claudia, Di Palma Benedetta Di Palma
+# AUTHORS: Calonghi Vittoria, Cristofolini Claudia, Di Palma Benedetta
 # DATE: January 2026
-# ==============================================================================
+# ====================================================================
 
 # 1. SET UP
 install.packages("tidyverse")
