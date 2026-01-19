@@ -1,8 +1,8 @@
-# ==============================================================================
+# ====================================================================
 # PROJECT: ANALYSIS OF SALES DATASET
-# AUTHORS: Calonghi Vittoria, Cristofolini Claudia, Di Palma Benedetta Di Palma
+# AUTHORS: Calonghi Vittoria, Cristofolini Claudia, Di Palma Benedetta
 # DATE: January 2026
-# ==============================================================================
+# ====================================================================
 
 # 1. SET UP
 install.packages("tidyverse")
@@ -19,16 +19,26 @@ install.packages("FactoMineR")
 library(tidyverse)
 library(scales)
 
-data<-read.csv("sales.csv", stringsAsFactors = TRUE)
+# We use raw url from our repository on GitHub to avoid acquisition errors
+raw_url <- "https://raw.githubusercontent.com/Vittoria-C/Data_Analysis_Project/refs/heads/main/sales.csv"
+
+# We convert nominal strings to factors to ensure correct domain definition
+# and enables frequency-based analysis during the EDA phase
+data <- read.csv(raw_url, stringsAsFactors = TRUE)
 
 View(data)
+# We display the first six rows of the dataset
+head(data)
+
+# and verify data integrity, if there are missing values in the dataset
+# False means no missing values founded
 any(is.na(data))
 
+# ==============================================================================
+#  EXPLORATORY DATA ANALYSIS (EDA)
+# ==============================================================================
 
-
-# 3. EXPLORATORY DATA ANALYSIS (EDA)
-
-# STATISTICAL SUMMARY  (KPIs)
+# 1. STATISTICAL SUMMARY  (KPIs)
 # We display the summary of data 
 
 summary(data)
@@ -47,10 +57,8 @@ kpi_summary <- data %>%
 print("GLOBAL KEY PERFORMANCE INDICATORS:")
 print(kpi_summary)
 
-# We verify data integrity, if there are missing values in the dataset
-paste("Missing values:", sum(is.na(data)))
 
-# GEOGRAPHIC PERFORMANCE
+# 2. GEOGRAPHIC PERFORMANCE
 # We identify top-performing areas. Note: Each city maps to a single branch.
 # Bar plot: Total Revenues by City and Branch
 plot_branch <- data %>%
@@ -69,11 +77,12 @@ plot_branch <- data %>%
 plot_branch
 
 
-# CUSTOMER DEMOGRAPHIC & LOYALTY
+# 3. CUSTOMER DEMOGRAPHIC & LOYALTY
 
+# A) Bar plot: Gender-based Quantity Analysis
 # we perform a gender analysis to understand the purchasing power and volume per gender 
 # to better tailor future marketing campaigns
-# Bar plot: Gender-based Quantity Analysis
+
 plot_gender <- data %>%
   group_by(gender) %>%
   summarise(Total_Qty = sum(quantity)) %>%
@@ -86,10 +95,10 @@ plot_gender <- data %>%
   labs(title = "Gender-based Quantity Analysis", x = "Gender", y = "Total Quantity")
 plot_gender
 
+# B) Pie chart: Distribution of Sales by Customer Type (Members or not)
 # We evaluate the ratio of Members vs. Normal customers to see the loyalty
 # program penetration 
 
-# Pie chart: Distribution of Sales by Customer Type (Members or not)
 plot_cust <- data %>%
   count(customer_type) %>%
   mutate(perc = n / sum(n)) %>%
@@ -106,10 +115,11 @@ plot_cust <- data %>%
 plot_cust
 
 
-# PRODUCT AND CATEGORIES ANALYSIS 
+# 4. PRODUCT AND CATEGORIES ANALYSIS 
 
-# We identify high-rotation products based on total quantity sold (inventory)
-# Bar plot: Top-selling Products based on Quantity
+# A) We identify high-rotation products based on total quantity sold (inventory)
+# Bar plot: Top-selling Products based on Quantity 
+
 plot_prod <- data %>%
   group_by(product_name) %>%
   summarise(Total_Qty = sum(quantity)) %>%
@@ -121,13 +131,12 @@ plot_prod <- data %>%
   coord_flip() +  # swapping coordinates x, y for cleaner labeling
   theme_minimal() +
   labs(title = "Top-selling Products by Quantity", x = "Product", y = "Quantity")
-
 plot_prod
 
-# Analysis of Sales Volume  to identify which categories have the highest inventory turnover.
+# B) Analysis of Sales Volume  to identify which categories have the highest inventory turnover.
 # (the most frequently purchased, that usually are "essential" or "high-frequency product" 
-
 # Bar plot: Top-selling Categories by Quantity
+
 plot_cat <- data %>%
   group_by(product_category) %>%
   summarise(Total_Qty = sum(quantity)) %>%
@@ -139,11 +148,10 @@ plot_cat <- data %>%
   coord_flip() +
   theme_minimal() +
   labs(title = "Top-selling Categories by Quantity", x = "Product Category", y = "Quantity")
-
 plot_cat
 
 
-# Analysis of Revenue Contribution to understand financial impact
+# C) Analysis of Revenue Contribution to understand financial impact
 # Pie chart: Product Categories Contribution to Revenues
 plot_cat_rev <- data %>%
   group_by(product_category) %>%
@@ -164,7 +172,10 @@ plot_cat_rev
 
 
 
+# =================================================================
 # CORRELATION ANALYSIS 
+# =================================================================
+
 library(corrplot)
 
 # For correlation analysis we use only numeric variables
@@ -222,8 +233,6 @@ library(cluster)
 library(dbscan)
 
 # 1. Setup and Data Loading
-View(data)
-any(is.na(data))
 
 data$customer_type <- as.factor(data$customer_type)
 data$product_category <- as.factor(data$product_category)
@@ -286,11 +295,10 @@ as.integer(data$cluster)
 point=c(3,4,5)
 as.integer(data$city)
 
-
 plot(data$quantity, data$total_price, col = colors[data$cluster],
   pch = point[data$city], xlab = "Quantity", ylab = "Total price",
   main = "Quantity vs Total Price")
-legend("top",  legend = unique(data_km$cluster), col = colors,
+legend("top",  legend = unique(data$cluster), col = colors,
   pch = 16, title = "Cluster", cex = 0.8)
 legend(  "topleft", legend = levels(data$city), pch = point,
   title = "City", cex = 0.8)
@@ -299,11 +307,10 @@ as.integer(data$gender)
 plot(data$quantity,data$total_price,col=colors[as.integer(data$cluster)],
 pch=point[as.integer(data$gender)], xlab = "Quantity", ylab = "Total price",
   main = "Quantity vs Total Price")
-legend("top", legend = unique(data_km$cluster), col = colors,
+legend("top", legend = unique(data$cluster), col = colors,
   pch = 16, title = "Cluster", cex = 0.8)
 legend(  "topleft", legend = levels(data$gender), pch = point,
   title = "City", cex = 0.8)
-
 
 
 # 4. K-means Clustering
@@ -322,13 +329,15 @@ data_km$ifault
 View(data_scaled)
 
 plot(data_scaled[, 2], data_scaled[, 4], col = data_km$cluster, 
-pch = 19,xlab = colnames(data_scaled)[2],  ylab = colnames(data_scaled)[4], main = "K-means clustering (k = 3)")
+pch = 19,xlab = colnames(data_scaled)[2],  ylab = colnames(data_scaled)[4], 
+     main = "K-means clustering (k = 3)")
 points(centroids[, 2], centroids[, 4],pch = 1,    cex = 1.5,  col = "black")
 text(centroids[, 2], centroids[, 4], labels = paste("C", 1:nrow(centroids)),
 pos = 3, cex = 0.8)
 
 plot(data_scaled[, 1], data_scaled[, 2], col = data_km$cluster, 
-pch = 19,xlab = colnames(data_scaled)[1],  ylab = colnames(data_scaled)[2], main = "K-means clustering (k = 3)")
+pch = 19,xlab = colnames(data_scaled)[1],  ylab = colnames(data_scaled)[2], 
+     main = "K-means clustering (k = 3)")
 points(centroids[, 1], centroids[, 2],pch = 1,    cex = 1.5,  col = "black")
 text(centroids[, 1], centroids[, 2], labels = paste("C", 1:nrow(centroids)),
 pos = 3, cex = 0.8)
@@ -507,5 +516,5 @@ geom_point(alpha = 0.6) +
 
 # 5. NORMAL Q-Q PLOT
 par(mfrow = c(1,1))
-qqnorm(resid(model3))
-qqline(resid(model3))
+qqnorm(resid(model2))
+qqline(resid(model2))
