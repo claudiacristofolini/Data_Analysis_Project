@@ -10,4 +10,7 @@ The dataset used for the analysis is sales.csv, while the R code developed for t
 
 The PDF document Analysis-of-Sales-Dataset includes the complete script with the executed code and related outputs.
 
-Finally, the document Supermarket_sales_data_analysis_Report presents a detailed report describing the methodology, logic, and steps followed throughout the data analysis process.
+The document Supermarket_sales_data_analysis_Report presents a detailed report describing the methodology, logic, and steps followed throughout the data analysis process.
+
+Finally, the PDF presentation represents our discussion in class. 
+
